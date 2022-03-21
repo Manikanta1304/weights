@@ -34,6 +34,57 @@ for count,m1 in enumerate(df[df['M1_converted'].notna()]['M1_converted']):
         index = 'no match'
         m1_match_m2 = 'no match'
         
+        
+*************************************************************************************************************************************8
+        
+        
+def distance2(boxA, boxB):
+    return(list(np.abs(np.array(boxA)- np.array(boxB))))
+
+m2_match_m3=[] 
+for count, m2 in enumerate(df[df['M2_converted'].notna()]['M2_converted']):
+    m2_box = ast.literal_eval(m2)
+    iou_lst =[]
+    diff = []
+    min_list = []
+    
+    for c,m3 in enumerate(df[df['M3_converted'].notna()]['M3_converted']):
+        m3_box = ast.literal_eval(m3)
+        correct = distance2(m2_box, m3_box)    
+        if all(i < 1000 for i in correct):
+            min_list.append(m3_box)
+
+    for j in min_list:
+        correct_iou = bb_intersection_over_union(m2_box, j)
+        iou_lst.append(correct_iou)
+
+    val = max(iou_lst)
+    index = iou_lst.index(val)
+    match = min_list[index]
+    m2_match_m3.append(match)
+    
+    print('shortlisted bboxes from stage1:',min_list)
+    print('IOUs of above boxes:' , iou_lst)
+    print('match:', match,'\n','*'*50)
+     
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     print("val",val)
     print("index",index)
     
