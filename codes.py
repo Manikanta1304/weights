@@ -130,3 +130,23 @@ iou_score = numpy.sum(intersection) / numpy.sum(union)
 
 print(‘IoU is %s’ % iou_score)
 
+
+
+
+
+
+
+
+
+
+
+
+
+import numpy as np
+component1 = np.array([[0,1,1],[0,1,1],[0,1,1]], dtype=bool)
+component2 = np.array([[1,1,0],[1,1,0],[1,1,0]], dtype=bool)
+
+overlap = component1*component2 # Logical AND
+union = component1 + component2 # Logical OR
+
+IOU = overlap.sum()/float(union.sum()) 
