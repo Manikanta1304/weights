@@ -103,3 +103,30 @@ df
 def distance(boxA, boxB):
     diff_sum = np.abs(sum(np.array(boxA) -  np.array(boxB)))
     return diff_sum
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+intersection = numpy.logical_and(result1, result2)
+
+union = numpy.logical_or(result1, result2)
+
+iou_score = numpy.sum(intersection) / numpy.sum(union)
+
+print(‘IoU is %s’ % iou_score)
+
