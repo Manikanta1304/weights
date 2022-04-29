@@ -1,3 +1,45 @@
+def rescaling_cords(img, x0_original, y0_original):
+	scale_x = 2.5
+	scale_y = 2
+	resized_img = cv2.resize(img, [int(cols*scale_x), int(rows*scale_y)], interpolation=cv2.INTER_NEAREST)
+	resized_rows, resized_cols = resized_img.shape[0:2] # cols = 800, rows = 512
+
+
+
+	# Compute center column and center row
+	x_original_center = (cols-1) / 2 # 159.5
+	y_original_center = (rows-1) / 2 # 127.5
+
+
+
+	# Compute center of resized image
+	x_scaled_center = (resized_cols-1) / 2 # 399.5
+	y_scaled_center = (resized_rows-1) / 2 # 255.5
+
+
+
+	# Compute the destination coordinates after resize
+	x1_scaled = (x0_original - x_original_center)*scale_x + x_scaled_center # 399.5
+	y1_scaled = (y0_original - y_original_center)*scale_y + y_scaled_center # 255.5
+	return int(x1_scaled), int(y1_scaled)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 img = cv.imread('sudoku.png')
 rows,cols,ch = img.shape
@@ -7,32 +49,6 @@ M = cv.getPerspectiveTransform(pts1,pts2)
 dst = cv.warpPerspective(img,M,(300,300))
 plt.subplot(121),plt.imshow(img),plt.title('Input')
 plt.subplot(122),plt.imshow(dst),plt.title('Output')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
