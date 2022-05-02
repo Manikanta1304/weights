@@ -1,3 +1,22 @@
+ef feature_detection():
+    st.subheader('Feature Detection in images')
+    st.write("SIFT")
+    image = load_image("tom1.jpg")
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    sift = cv2.xfeatures2d.SIFT_create()    
+    keypoints = sift.detect(gray, None)
+     
+    st.write("Number of keypoints Detected: ",len(keypoints))
+    image = cv2.drawKeypoints(image, keypoints, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    st.image(image, use_column_width=True,clamp = True)
+
+
+
+
+
+
+
+
 # Reshaping the image into a 2D array of pixels and 3 color values (RGB)
 pixel_vals = apple_img.reshape((-1,3))
 print(pixel_vals.shape, type(pixel_vals[0][0]))
@@ -23,23 +42,6 @@ segmented_data = centers[labels.flatten()]
  
 # reshape data into the original image dimensions
 segmented_image = segmented_data.reshape((apple_img.shape))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
