@@ -1,4 +1,19 @@
-ef feature_detection():
+query_img_bw = cv2.cvtColor(query_img,cv2.COLOR_BGR2GRAY)
+train_img_bw = cv2.cvtColor(train_img, cv2.COLOR_BGR2GRAY)
+  
+# Initialize the ORB detector algorithm
+orb = cv2.ORB_create()
+  
+# Now detect the keypoints and compute
+# the descriptors for the query image
+# and train image
+queryKeypoints, queryDescriptors = orb.detectAndCompute(query_img_bw,None)
+trainKeypoints, trainDescriptors = orb.detectAndCompute(train_img_bw,None)
+
+
+
+
+def feature_detection():
     st.subheader('Feature Detection in images')
     st.write("SIFT")
     image = load_image("tom1.jpg")
