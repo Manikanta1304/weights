@@ -1,3 +1,51 @@
+# Reshaping the image into a 2D array of pixels and 3 color values (RGB)
+pixel_vals = apple_img.reshape((-1,3))
+print(pixel_vals.shape, type(pixel_vals[0][0]))
+
+# Convert to float type
+import numpy as np
+pixel_vals = np.float32(pixel_vals)
+print(pixel_vals.shape, type(pixel_vals[0][0]))
+
+#the below line of code defines the criteria for the algorithm to stop running,
+#which will happen is 100 iterations are run or the epsilon (which is the required accuracy)
+#becomes 85%
+criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.85)
+ 
+# then perform k-means clustering wit h number of clusters defined as 3
+#also random centres are initially chosen for k-means clustering
+k = 9
+retval, labels, centers = cv2.kmeans(pixel_vals, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+ 
+# convert data into 8-bit values
+centers = np.uint8(centers)
+segmented_data = centers[labels.flatten()]
+ 
+# reshape data into the original image dimensions
+segmented_image = segmented_data.reshape((apple_img.shape))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def controller(img, brightness=255,
                contrast=127):
    
