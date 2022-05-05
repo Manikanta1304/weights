@@ -1,3 +1,35 @@
+
+import os
+import pandas as pd
+
+# set the path to your file location
+path = r'path\to\Text'
+# create a empty list, where you store the content
+list_of_text = []
+
+# loop over the files in the folder
+for file in os.listdir(path):
+    # open the file
+    with open(os.path.join(path, file)) as f:
+        text = f.read()
+    # append the text and filename
+    list_of_text.append((text, file))
+
+# create a dataframe and save
+df = pd.DataFrame(list_of_text, columns = ['Text', 'Filename'])
+df.to_csv(os.path.join(path, 'new_csv_file.csv'))
+
+
+
+
+
+
+
+
+
+
+
+
 padding = 0
 st.markdown(f""" <style>
     .reportview-container .main .block-container{{
