@@ -1,4 +1,25 @@
-
+req_l = []
+for v in value:
+    start = v
+    end = ""
+    print(v)
+    l1_index = l1.index(v)
+    for j in l1[l1_index:]:
+        if j in value:
+            end = j
+            if j != v:
+                value.remove(j)
+        else:
+            if not end:
+                end = start
+            req_l.append(start+"-"+end)
+            break
+		
+		
+		
+		
+		
+		
 import os
 import pandas as pd
 
