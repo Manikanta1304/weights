@@ -1,3 +1,32 @@
+def cagr(start_value, end_value, num_periods):
+    return (end_value / start_value) ** (1 / (num_periods - 1)) - 1
+
+
+cagr_values = []
+for i in df.columns:
+    start_value = float(df[i].loc['2018'])
+    end_value = float(df[i].loc['2016'])
+    num_periods = len(df[i].loc['2016':'2018'])
+    cagr_values.append(cagr(start_value, end_value, num_periods))
+
+pd.concat([df, pd.DataFrame([cagr_values], columns=df.columns)], index='cagr')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 req_l = []
 for v in value:
     start = v
