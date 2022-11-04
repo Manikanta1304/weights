@@ -1,3 +1,32 @@
+print("start")
+import win32api, win32con
+import time
+
+n = 100
+
+def click(x,y):
+    win32api.SetCursorPos((x,y))
+    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,x,y,0,0)
+    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,x,y,0,0)
+
+for i in range(1000):
+    print(i)
+    time.sleep(60*1)
+    click(10,10)
+    time.sleep(60*1)
+    click(80,80)
+    time.sleep(60*1)
+    click(1000,1000)
+
+
+
+
+
+
+
+
+
+
 def cagr(start_value, end_value, num_periods):
     return (end_value / start_value) ** (1 / (num_periods - 1)) - 1
 
