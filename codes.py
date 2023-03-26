@@ -58,6 +58,12 @@ cropped_img = src_img.crop(src_bbox)
 dest_bbox = (dest_x, dest_y, dest_x + width, dest_y + height)
 cropped_img = cropped_img.resize((dest_bbox[2]-dest_bbox[0], dest_bbox[3]-dest_bbox[1]))
 
+# Get the average color of the destination bounding box
+box_avg_color = dest_img.crop(dest_bbox).resize((1, 1)).getpixel((0, 0))
+
+# Blend the cropped image with the destination image based on the average color of the destination bounding box
+blended_img = Image.blend(cropped_img, dest_img.crop(dest_bbox), 0.5 * (box_avg_color[0] + box_avg_color[1] + box_avg_color[2]) / 765)
+
 
 # Paste the cropped image onto the destination image
 dest_img.paste(cropped_img, dest_bbox)
