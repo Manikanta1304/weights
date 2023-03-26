@@ -1,3 +1,47 @@
+import os
+import streamlit as st
+from azure.storage.blob import BlockBlobService
+
+# Azure Data Lake Gen1 connection details
+account_name = '<your_account_name>'
+account_key = '<your_account_key>'
+container_name = '<your_container_name>'
+blob_service = BlockBlobService(account_name=account_name, account_key=account_key)
+
+# Local folder to download the images to
+local_folder = './images'
+os.makedirs(local_folder, exist_ok=True)
+
+# Download the images from the Azure Data Lake Gen1 container to the local folder
+blobs = blob_service.list_blobs(container_name)
+image_blobs = [blob for blob in blobs if blob.name.endswith('.jpg') or blob.name.endswith('.jpeg') or blob.name.endswith('.png')]
+for blob in image_blobs:
+    blob_name = blob.name
+    local_path = os.path.join(local_folder, blob_name)
+    blob_service.get_blob_to_path(container_name, blob_name, local_path)
+
+# Configure Streamlit to serve the images from the local folder
+st.set_option('server.use_static_cache', False)
+
+# Display the images on the Streamlit web application
+st.title('Azure Data Lake Gen1 Images')
+for blob in image_blobs:
+    blob_name = blob.name
+    local_path = os.path.join(local_folder, blob_name)
+    st.image(local_path, caption=blob_name)
+
+
+
+
+
+
+
+
+
+
+
+
+
 from PIL import Image
 
 # Open the source and destination images
