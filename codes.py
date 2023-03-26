@@ -1,3 +1,43 @@
+from PIL import Image
+
+# Open the source and destination images
+src_img = Image.open("source_image.jpg")
+dest_img = Image.open("destination_image.jpg")
+
+# Define the bounding box coordinates of the source image
+src_bbox = (x, y, x + width, y + height)
+
+# Crop the source image using the bounding box
+cropped_img = src_img.crop(src_bbox)
+
+# Define the bounding box coordinates of the destination image
+dest_bbox = (dest_x, dest_y, dest_x + width, dest_y + height)
+
+# Paste the cropped image onto the destination image
+dest_img.paste(cropped_img, dest_bbox)
+
+# Save the new image
+dest_img.save("output_image.jpg")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 print("start")
 import win32api, win32con
 import time
