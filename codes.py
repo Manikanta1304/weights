@@ -56,6 +56,8 @@ cropped_img = src_img.crop(src_bbox)
 
 # Define the bounding box coordinates of the destination image
 dest_bbox = (dest_x, dest_y, dest_x + width, dest_y + height)
+cropped_img = cropped_img.resize((dest_bbox[2]-dest_bbox[0], dest_bbox[3]-dest_bbox[1]))
+
 
 # Paste the cropped image onto the destination image
 dest_img.paste(cropped_img, dest_bbox)
