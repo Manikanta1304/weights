@@ -1,3 +1,30 @@
+import cv2
+import numpy as np
+
+# Load the source and target images
+source_img = cv2.imread("source.jpg")
+target_img = cv2.imread("target.jpg")
+
+# Calculate the mean and standard deviation of the color channels in each image
+source_mean, source_std = cv2.meanStdDev(source_img)
+target_mean, target_std = cv2.meanStdDev(target_img)
+
+# Normalize the color channels of the target image using the source image statistics
+for i in range(3):  # Loop over color channels (B, G, R)
+    target_img[:, :, i] = ((target_img[:, :, i] - target_mean[i]) * (source_std[i] / target_std[i])) + source_mean[i]
+
+# Clip the pixel values to the range [0, 255]
+target_img = np.clip(target_img, 0, 255).astype(np.uint8)
+
+# Save the resulting image
+cv2.imwrite("result.jpg", target_img)
+
+
+
+
+
+
+
 import os
 import streamlit as st
 from azure.storage.blob import BlockBlobService
