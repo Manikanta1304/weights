@@ -1,3 +1,12 @@
+# Fill pixel values greater than 100 with random grayscale values
+mask = target_img > 100
+gray = np.random.randint(0, 256, size=target_img.shape[:2], dtype=np.uint8)
+gray = np.expand_dims(gray, axis=2)
+fill = np.tile(gray, [1, 1, 3])
+target_img = np.where(mask, fill, target_img)
+
+
+
 # Threshold the source image to remove the brightest pixels
 source_gray = cv2.cvtColor(source_img, cv2.COLOR_BGR2GRAY)
 source_thresh = cv2.threshold(source_gray, 250, 255, cv2.THRESH_BINARY_INV)[1]
