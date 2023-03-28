@@ -35,6 +35,43 @@ cv2.destroyAllWindows()
 
 
 
+import cv2
+import numpy as np
+
+# Load the target image and the source image
+target_img = cv2.imread('target_image.jpg')
+source_img = cv2.imread('source_image.jpg')
+
+# Resize the source image to match the size of the target image
+source_img = cv2.resize(source_img, (target_img.shape[1], target_img.shape[0]))
+
+# Convert the images to grayscale
+target_gray = cv2.cvtColor(target_img, cv2.COLOR_BGR2GRAY)
+source_gray = cv2.cvtColor(source_img, cv2.COLOR_BGR2GRAY)
+
+# Threshold the target image to create a binary mask
+ret, mask = cv2.threshold(target_gray, 10, 255, cv2.THRESH_BINARY)
+
+# Define the kernel for the morphological operations
+kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+
+# Erode the mask to remove small gaps
+mask_eroded = cv2.erode(mask, kernel)
+
+# Dilate the mask to fill in any remaining gaps
+mask_dilated = cv2.dilate(mask_eroded, kernel)
+
+# Apply the mask to the source image
+result = cv2.bitwise_and(source_img, source_img, mask=mask_dilated)
+
+# Show the result
+cv2.imshow('Result', result)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+
+
 
 
 import cv2
