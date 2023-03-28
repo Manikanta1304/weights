@@ -1,6 +1,45 @@
 import cv2
 import numpy as np
 
+# Load the target image and the source image
+target_img = cv2.imread('target_image.jpg')
+source_img = cv2.imread('source_image.jpg')
+
+# Resize the source image to match the size of the target image
+source_img = cv2.resize(source_img, (target_img.shape[1], target_img.shape[0]))
+
+# Convert the images to grayscale
+target_gray = cv2.cvtColor(target_img, cv2.COLOR_BGR2GRAY)
+source_gray = cv2.cvtColor(source_img, cv2.COLOR_BGR2GRAY)
+
+# Create a mask by thresholding the target image
+ret, mask = cv2.threshold(target_gray, 10, 255, cv2.THRESH_BINARY)
+
+# Invert the mask
+mask_inv = cv2.bitwise_not(mask)
+
+# Apply the mask to the source image
+source_bg = cv2.bitwise_and(source_img, source_img, mask=mask_inv)
+
+# Apply the mask to the target image
+target_fg = cv2.bitwise_and(target_img, target_img, mask=mask)
+
+# Blend the source and target images using the mask
+result = cv2.add(source_bg, target_fg)
+
+# Show the result
+cv2.imshow('Result', result)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+
+
+
+
+import cv2
+import numpy as np
+
 # Load the source and target images
 source_img = cv2.imread("source.jpg")
 target_img = cv2.imread("target.jpg")
