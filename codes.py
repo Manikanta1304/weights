@@ -1,3 +1,28 @@
+# Threshold the source image to remove the brightest pixels
+source_gray = cv2.cvtColor(source_img, cv2.COLOR_BGR2GRAY)
+source_thresh = cv2.threshold(source_gray, 250, 255, cv2.THRESH_BINARY_INV)[1]
+source_thresh = cv2.cvtColor(source_thresh, cv2.COLOR_GRAY2BGR)
+source_img_thresh = cv2.bitwise_and(source_img, source_thresh)
+
+
+
+# Smooth the target image with a median filter or Gaussian blur
+smoothed_img = cv2.medianBlur(target_img, 5)
+# smoothed_img = cv2.GaussianBlur(target_img, (5, 5), 0)
+
+# Calculate the mean and standard deviation of the color channels in each image
+source_mean, source_std = cv2.meanStdDev(source_img)
+target_mean, target_std = cv2.meanStdDev(smoothed_img)
+
+
+
+
+
+# Smooth the target image with a median filter or Gaussian blur
+smoothed_img = cv2.medianBlur(target_img, 5)
+# smoothed_img = cv2.GaussianBlur(target_img, (5, 5), 0)
+
+
 import cv2
 import numpy as np
 
