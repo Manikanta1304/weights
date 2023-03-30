@@ -1,3 +1,17 @@
+create a script that will scan a folder in CDL and create corresp. folder containing thumbnails under thumbs. this script should run on the VM and take the CDL folder path as an argument
+
+write a streamlit app that
+
+has a drop-down to select the CDL path/directory with images
+
+allows a user to upload a img-groups.csv which contains a single group label for each image (i.e. two columns in the csv - image_filename and group_label)
+
+displays the image thumbnails in groups (as specified by the group_label in the csv)
+
+when a thumbnail is clicked, download the full resolution image from CDL and display on the right
+
+
+
 # Fill pixel values greater than 100 with random grayscale values
 mask = target_img > 100
 gray = np.random.randint(0, 256, size=target_img.shape[:2], dtype=np.uint8)
