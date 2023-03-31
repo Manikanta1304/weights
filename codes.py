@@ -1,3 +1,45 @@
+import os
+import random
+import pandas as pd
+
+# Set the path to your image directory
+image_dir = 'images-dir'
+
+# Get a list of all the image filenames in the directory
+image_filenames = os.listdir(image_dir)
+
+# Shuffle the list of image filenames randomly
+random.shuffle(image_filenames)
+
+# Define the number of groups
+num_groups = 3
+
+# Calculate the number of images per group, rounded to the nearest integer
+images_per_group = round(len(image_filenames) / num_groups)
+
+# Create a list of group labels with random integers between 1 and the number of groups
+group_labels = [random.randint(1, num_groups) for _ in range(len(image_filenames))]
+
+# Split the group labels into chunks of the same size
+group_label_chunks = [group_labels[i:i+images_per_group] for i in range(0, len(group_labels), images_per_group)]
+
+# If the last chunk is smaller than the others, merge it with the previous chunk
+if len(group_label_chunks[-1]) < images_per_group // 2:
+    group_label_chunks[-2] += group_label_chunks[-1]
+    group_label_chunks.pop()
+
+# Flatten the list of group label chunks to create a list of final group labels
+group_labels = [label for chunk in group_label_chunks for label in chunk]
+
+# Create a Pandas DataFrame with the image filenames and group labels as columns
+df = pd.DataFrame({'image_filename': image_filenames, 'group_label': group_labels})
+
+# Print the first few rows of the DataFrame to check it looks correct
+df.group_label.value_counts()
+
+
+
+
 import streamlit as st
 import os
 import pandas as pd
