@@ -18,6 +18,172 @@ st.markdown(f'''
     </style>
 ''',unsafe_allow_html=True)
 
+
+# Define CSS styles for the vertical line
+line_styles = """
+  border-left: 3px solid white;
+  height: 1300px;
+  position: absolute;
+  left: 20%;
+  right: 0%;
+  margin-left: -1px;
+  top: 0;
+"""
+    
+    
+st.sidebar.title('Image Explorer')
+directory = st.sidebar.text_input('Enter directory path:', '../images-dir')
+group_file = st.sidebar.file_uploader("Upload image-groups.csv", type=["csv"])
+
+# Set up the layout of the page with two columns
+col1, col2, col3, = st.columns([0.8, 0.05, 1])
+# col1, col3, = st.columns([0.7, 1], gap='small')
+
+# Initialize the index of the first image to be displayed
+start_index = st.session_state.get('start_index', 0)
+
+# Get image paths
+image_extensions = ['.jpg', '.jpeg', '.png']
+
+try:
+    image_paths = [os.path.join(directory, f) for f in os.listdir(directory) if f.endswith(tuple(image_extensions))] 
+ 
+    # Load the group information from the CSV file
+    if group_file:
+        group_df = pd.read_csv(group_file)
+        # Get the unique group labels from the CSV file
+        group_labels = ['All'] + list(group_df['Rim Type'].unique())
+
+        # Set up the group selection dropdown
+        selected_group = st.sidebar.selectbox('Select group', group_labels)
+
+        # Filter the images by the selected group
+        if selected_group == 'All':
+            filtered_image_paths = image_paths
+        else:
+            filtered_image_filenames = group_df[group_df['Rim Type'] == selected_group]['image_filename']
+            filtered_image_paths = [os.path.join(directory, f) for f in filtered_image_filenames]
+    else:
+        selected_group = ''
+        filtered_image_paths = image_paths
+
+    # Calculate number of rows in the grid
+    rows = len(filtered_image_paths) // 4 + 1
+
+    selected_image_path = ''
+
+    # Display the image grid in the container
+    with col1:
+        # Display the title and a horizontal line
+        st.write('# Image Explorer')
+        if selected_group:
+            st.write('### Group', selected_group)
+        st.write('---')
+
+        # Create the grid columns
+        grid = [st.columns(3) for i in range(rows)]
+
+        # Iterate over the images and display each one in the grid
+        for index, image_path in enumerate(filtered_image_paths[start_index:start_index+20]):
+            if index < 20:
+                image = Image.open(image_path)
+                image.thumbnail((200, 200))
+                j = index % 3
+                i = index // 3
+                grid[i][j].image(image, use_column_width=True) #, use_column_width=True, caption=os.path.basename(image_path))
+                # Display image and select button
+                button_key = f"select_button_{index}"
+                if grid[i][j].button(label="Select", key=button_key, help=f"Select {image_path}"):
+                    print(image_path.replace('thumbnails', 'original'))
+                    image_path = image_path.replace('thumbnails', 'original')
+                    selected_image_path = image_path
+                    
+                
+    prev_col, next_col = st.sidebar.columns([1,1])
+
+    with prev_col:
+        # Add a button to load the previous set of images
+        if start_index > 0:
+            if st.button('Previous'):
+                # Update the index of the first image to be displayed
+                start_index -= 20
+                st.session_state['start_index'] = start_index
+                # Refresh the page to load the previous set of images
+                st.experimental_rerun()
+
+    with next_col:
+        # Add a button to load the next set of images
+        if start_index + 20 < len(filtered_image_paths):
+            if st.button('Next', key='next_button'):
+                # Update the index of the first image to be displayed
+                start_index += 20
+                st.session_state['start_index'] = start_index
+                # Refresh the page to load the next set of images
+                st.experimental_rerun()
+                
+               
+
+               
+    with col2:
+        # # st.empty()
+        st.markdown(f'<div style="{line_styles}">', unsafe_allow_html=True)
+        
+
+    with col3:
+        # st.markdown(f'<div style="{line_styles}">', unsafe_allow_html=True)
+        st.write('# Full Size Image')
+        st.write('---')
+        if selected_image_path:
+            st.image(selected_image_path)
+            # Get the filename of the selected image
+            selected_image_filename = os.path.basename(selected_image_path)
+            # Get the current rim type for the selected image from the CSV file
+            current_rim_type = group_df[group_df['image_filename'] == selected_image_filename]['Rim Type'].iloc[0]
+            # Create a form to update the rim type for the selected image
+            with st.form(key='update_rim_type_form'):
+                new_rim_type = st.text_input('Update Rim Type:', value=current_rim_type)
+                submit_button = st.form_submit_button(label='Update')
+            # If the form is submitted, update the rim type in the CSV file
+            if submit_button:
+                group_df.loc[group_df['image_filename'] == selected_image_filename, 'Rim Type'] = new_rim_type
+                group_df = group_df.groupby('Rim Type').apply(lambda x: x.reset_index(drop=True))
+                group_df.to_csv(group_file.name, index=False)
+                st.success('Rim Type updated successfully!')
+                # Refresh the page to update the image grid with the updated group information
+                st.experimental_rerun()
+        else:
+            st.write('sfdsf')
+            st.write("Select an image from the grid to view.")
+
+    
+except FileNotFoundError as e:
+    st.write('Invalid Directory', e)
+
+
+
+
+
+
+import streamlit as st
+import os
+import pandas as pd
+from PIL import Image
+
+st.set_page_config(layout="wide")
+st.markdown("""
+        <style>
+               .block-container {
+                    padding-top: 1rem;
+                }
+        </style>
+        """, unsafe_allow_html=True)
+        
+st.markdown(f'''
+    <style>
+    section[data-testid="stSidebar"] .css-ng1t4o {{width: 14rem;}}
+    </style>
+''',unsafe_allow_html=True)
+
 # Define CSS styles for the vertical line
 col1_style = """
   left: 20%;
