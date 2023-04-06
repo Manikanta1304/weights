@@ -1,4 +1,18 @@
 import streamlit as st
+import pandas as pd
+   
+    
+df = pd.read_csv('tmp.csv')
+img_id = st.number_input("img_id",1,4,1)
+rim_type = st.text_input("rim type", df[df.img_id == img_id]['rim_type'].values[0])
+
+if st.button('add'): 
+    df.loc[df.img_id==img_id,'rim_type'] = rim_type
+    df.to_csv('tmp.csv',index=False)
+st.dataframe(df)
+
+
+import streamlit as st
 import os
 import pandas as pd
 from PIL import Image
