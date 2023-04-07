@@ -1,3 +1,22 @@
+import os
+import shutil
+
+# set the source and destination folders
+source_folders = ['/path/to/folder1', '/path/to/folder2', '/path/to/folder3']
+destination_folder = '/path/to/destination/folder'
+
+# iterate through the source folders
+for folder in source_folders:
+    # get a list of all the files in the folder
+    files = os.listdir(folder)
+    # iterate through the files and move them to the destination folder
+    for file_name in files:
+        full_file_name = os.path.join(folder, file_name)
+        if os.path.isfile(full_file_name):
+            shutil.move(full_file_name, destination_folder)
+
+	
+	
 import streamlit as st
 import pandas as pd
    
