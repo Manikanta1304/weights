@@ -1,3 +1,40 @@
+
+uploaded_file = st.sidebar.file_uploader("Upload image", accept_multiple_files=True, type=['png', 'jpeg', 'jpg', 'JPG'])
+
+if uploaded_file:
+if len(uploaded_file) == 1:
+    uploaded_file = uploaded_file[0]
+    with st.spinner(text='loading...'):
+	picture = Image.open(uploaded_file)
+	# picture = picture.resize((5184,3888))
+	st.sidebar.image(picture)
+	score_threshold = st.sidebar.slider("Confidence_threshold", 0.00,1.00,0.5,0.01)
+	nms_threshold = st.sidebar.slider("NMS_threshold", 0.00, 1.00, 0.4, 0.01)
+	picture1 = picture.save(f'../yolov5_files/input/{uploaded_file.name}')
+	print('picture saved')
+
+
+    if st.button('detect'):
+	source = os.path.sep.join([os.getcwd(), f'../yolov5_files/input/{uploaded_file.name}'])
+	results_df = run(weights=f"../best_yolo_v5_reannotate_32.pt", save_txt=f"{uploaded_file.name.split('.')[0]}.txt", 
+		    conf_thres=score_threshold, source=source, save_conf=True)
+
+	directory = os.path.sep.join([os.getcwd(),'../yolov5_files/runs/detect'])
+	runs_print = max([os.path.join(directory,d) for d in os.listdir(directory)], key=os.path.getmtime)
+	detected_img = Image.open(os.path.join(runs_print, uploaded_file.name))
+
+	gb = GridOptionsBuilder.from_dataframe(results_df)
+	gb.configure_pagination()
+	gb.configure_side_bar()
+	gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc="sum", editable=True)
+	gb.configure_selection(selection_mode="multiple", use_checkbox=True)
+	gridOptions = gb.build()
+	data = AgGrid(results_df.head(1), 
+		      gridOptions=gridOptions, 
+		      enable_enterprise_modules=True, 
+		      allow_unsafe_jscode=True, 
+		      update_mode=GridUpdateMode.SELECTION_CHANGED)
+		
 import os
 import shutil
 
