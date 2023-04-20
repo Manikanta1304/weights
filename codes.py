@@ -1,3 +1,41 @@
+st.title("Dot Detector")
+st.write("You can view real-time object detection done using YOLO model here.")
+st.markdown(
+f'''
+<style>
+.sidebar .sidebar-content {{width:250}}
+.css-zbg2rx {{width:13rem !important}}   
+</style>
+''',
+unsafe_allow_html = True)
+
+# uploaded_file = st.sidebar.file_uploader("Upload image", accept_multiple_files=True, type=['png', 'jpeg', 'jpg', 'JPG'])
+directory = st.sidebar.text_input('Enter directory path:', './test-images')
+
+if st.button('Detect'):
+    run(data_mount_path = directory)
+
+
+    results_df = pd.read_csv('./predictions.csv')
+    gb = GridOptionsBuilder.from_dataframe(results_df)
+    gb.configure_pagination()
+    gb.configure_side_bar()
+    gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc="sum", editable=True)
+    gb.configure_selection(selection_mode="multiple", use_checkbox=True)
+    gridOptions = gb.build()
+    data = AgGrid(results_df,
+                  gridOptions=gridOptions, 
+                  enable_enterprise_modules=True, 
+                  allow_unsafe_jscode=True, 
+                  update_mode=GridUpdateMode.SELECTION_CHANGED)
+    
+    if len(data["selected_rows"])>0:
+        detected_img = Image.open(os.path.join('./test_images', data["selected_rows"][0]['file_name']))
+        st.image(detected_img, channels='BGR')
+
+
+
+
 
 uploaded_file = st.sidebar.file_uploader("Upload image", accept_multiple_files=True, type=['png', 'jpeg', 'jpg', 'JPG'])
 
