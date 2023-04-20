@@ -1,3 +1,52 @@
+import streamlit as st
+import pandas as pd
+import os
+from PIL import Image
+from streamlit_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode
+
+def run(data_mount_path):
+    # code for object detection
+    # saves the results to a csv file './predictions.csv'
+
+st.title("Dot Detector")
+st.write("You can view real-time object detection done using YOLO model here.")
+st.markdown(
+f'''
+<style>
+.sidebar .sidebar-content {{width:250}}
+.css-zbg2rx {{width:13rem !important}}   
+</style>
+''',
+unsafe_allow_html = True)
+
+directory = st.sidebar.text_input('Enter directory path:', './test-images')
+
+if st.button('Detect'):
+    run(data_mount_path=directory)
+    results_df = pd.read_csv('./predictions.csv')
+
+    if not results_df.empty:
+        gb = GridOptionsBuilder.from_dataframe(results_df)
+        gb.configure_pagination()
+        gb.configure_side_bar()
+        gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc="sum", editable=True)
+        gb.configure_selection(selection_mode="multiple", use_checkbox=True)
+        gridOptions = gb.build()
+        data = AgGrid(results_df,
+                      gridOptions=gridOptions, 
+                      enable_enterprise_modules=True, 
+                      allow_unsafe_jscode=True, 
+                      update_mode=GridUpdateMode.SELECTION_CHANGED)
+
+selected_rows = data["selected_rows"]
+if selected_rows and len(selected_rows) > 0:
+    detected_img = Image.open(os.path.join('./test_images', selected_rows[0]['file_name']))
+    st.image(detected_img, channels='BGR')
+
+	
+	
+	
+	
 st.title("Dot Detector")
 st.write("You can view real-time object detection done using YOLO model here.")
 st.markdown(
