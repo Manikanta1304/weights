@@ -36,12 +36,18 @@ if st.button('Detect'):
                       gridOptions=gridOptions, 
                       enable_enterprise_modules=True, 
                       allow_unsafe_jscode=True, 
-                      update_mode=GridUpdateMode.SELECTION_CHANGED)
+                      update_mode=GridUpdateMode.VALUE_CHANGED)
+        
+        # Store the selected rows in a Streamlit variable
+        selected_rows = data["selected_rows"]
+        st.session_state.selected_rows = selected_rows
 
-selected_rows = data["selected_rows"]
-if selected_rows and len(selected_rows) > 0:
-    detected_img = Image.open(os.path.join('./test_images', selected_rows[0]['file_name']))
-    st.image(detected_img, channels='BGR')
+if 'selected_rows' in st.session_state and st.session_state.selected_rows:
+    selected_rows = st.session_state.selected_rows
+    for row in selected_rows:
+        detected_img = Image.open(os.path.join('./test_images', row['file_name']))
+        st.image(detected_img, channels='BGR')
+
 
 	
 	
