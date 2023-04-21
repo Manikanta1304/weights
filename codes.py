@@ -1,3 +1,27 @@
+import numpy as np
+from scipy.cluster.hierarchy import linkage, fcluster
+from Levenshtein import distance
+
+# Sample data
+strings = ['apple', 'banana', 'cherry', 'aple', 'bananana']
+
+# Compute distance matrix
+dist_mat = np.zeros((len(strings), len(strings)))
+for i in range(len(strings)):
+    for j in range(len(strings)):
+        dist_mat[i,j] = distance(strings[i], strings[j])
+
+# Cluster using complete linkage and a distance threshold of 3
+Z = linkage(dist_mat, method='complete')
+clusters = fcluster(Z, 3, criterion='distance')
+
+# Print results
+for i in range(len(strings)):
+    print(f"{strings[i]} is in cluster {clusters[i]}")
+
+
+
+
 import Levenshtein
 
 strings = ["apple", "banana", "cherry", "aple", "bananana"]
