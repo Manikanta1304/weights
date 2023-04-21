@@ -1,3 +1,56 @@
+import os
+os.environ["AZUREML_MODEL_DIR"] = '.'
+
+import streamlit as st
+from PIL import Image
+
+from st_aggrid import AgGrid
+from st_aggrid.shared import GridUpdateMode
+from st_aggrid.grid_options_builder import GridOptionsBuilder
+import pandas as pd
+from detect_cli_new import run
+
+st.title("Dot Detector")
+st.write("You can view real-time object detection done using YOLO model here.")
+st.markdown(
+f'''
+<style>
+.sidebar .sidebar-content {{width:250}}
+.css-zbg2rx {{width:13rem !important}}   
+</style>
+''',
+
+unsafe_allow_html = True)
+
+directory = st.sidebar.selectbox('Select directory path:', ('', './test-images',))
+
+# st.cache(suppress_st_warning=True)
+# def long_running_function():
+    # run(directory)
+    # results_df = pd.read_csv('predictions.csv')
+    # return results_df
+    
+results_df = run(directory)
+    
+if 'df' not in st.session_state:  
+    st.session_state.df = results_df
+
+if len(st.session_state.df)>0:
+    gb = GridOptionsBuilder.from_dataframe(st.session_state.df)
+    gb.configure_side_bar()
+    gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc="sum", editable=True, )
+    gb.configure_selection(selection_mode="multiple", use_checkbox=True)
+    gridOptions = gb.build()
+    data = AgGrid(st.session_state.df, 
+                  gridOptions=gridOptions, 
+                  enable_enterprise_modules=True, 
+                  allow_unsafe_jscode=True, 
+                  update_mode=GridUpdateMode.SELECTION_CHANGED, height=100)
+        
+    # st.write(data["selected_rows"])
+    detected_img = Image.open(os.path.join('./test-images', data["selected_rows"][0]['Image_ID']+'.jpg'))
+    st.image(detected_img, channels='BGR')
+
 import streamlit as st
 import pandas as pd
 import os
