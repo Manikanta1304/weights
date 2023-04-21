@@ -1,3 +1,58 @@
+import streamlit as st
+import pandas as pd
+import tempfile
+import os
+
+@st.experimental_singleton
+def get_predictions(image_dir):
+    results_df = run(image_dir)
+    return results_df
+    
+sidebar_col, grid_col, detect_col = st.columns([1,2,3])
+
+with sidebar_col:
+    uploaded_files = st.file_uploader("Upload image", accept_multiple_files=True, type=['png', 'jpeg', 'jpg', 'JPG'], key='image_dir')
+    if uploaded_files is not None:
+        # Create a temporary directory to store the uploaded files
+        temp_dir = tempfile.TemporaryDirectory()
+        for uploaded_file in uploaded_files:
+            # Save each uploaded file to the temporary directory
+            uploaded_file_path = os.path.join(temp_dir.name, uploaded_file.name)
+            with open(uploaded_file_path, 'wb') as f:
+                f.write(uploaded_file.read())
+        # Use the temporary directory as the image directory for YOLO
+        image_dir = temp_dir.name
+        results_df = get_predictions(image_dir)
+        st.experimental_singleton.set('df', results_df)
+        
+
+if st.experimental_singleton.get('df') is not None:
+    results_df = st.experimental_singleton.get('df')
+    gb = GridOptionsBuilder.from_dataframe(results_df)
+    gb.configure_pagination()
+    gb.configure_side_bar()
+    gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc="sum", editable=True)
+    gb.configure_selection(selection_mode="multiple", use_checkbox=True)
+    gridOptions = gb.build()
+    data = AgGrid(results_df,
+                  gridOptions=gridOptions, 
+                  enable_enterprise_modules=True, 
+                  allow_unsafe_jscode=True, 
+                  update_mode=GridUpdateMode.SELECTION_CHANGED)
+    
+    if len(data["selected_rows"])>0:
+        detected_img = Image.open(os.path.join(image_dir, data["selected_rows"][0]['file_name']))
+        st.image(detected_img, channels='BGR')
+
+
+
+
+
+
+
+
+
+
 def get_predictions():
     results_df = run(st.session_state['image_dir'])
     st.session_state['df'] = results_df
