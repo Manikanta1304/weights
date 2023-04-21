@@ -1,3 +1,13 @@
+import Levenshtein
+
+strings = ["apple", "banana", "cherry", "aple", "bananana"]
+
+for i in range(len(strings)):
+    for j in range(i + 1, len(strings)):
+        distance = Levenshtein.distance(strings[i], strings[j])
+        print(f"Levenshtein distance between '{strings[i]}' and '{strings[j]}' is {distance}")
+
+
 import streamlit as st
 import pandas as pd
 import tempfile
