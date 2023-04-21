@@ -6,6 +6,33 @@ def get_predictions():
 sidebar_col, grid_col, detect_col = st.columns([1,2,3])
 
 with sidebar_col:
+    uploaded_files = st.file_uploader("Upload image", accept_multiple_files=True, type=['png', 'jpeg', 'jpg', 'JPG'], key='image_dir')
+    if uploaded_files is not None:
+        # Create a temporary directory to store the uploaded files
+        temp_dir = tempfile.TemporaryDirectory()
+        uploaded_file_paths = []
+        for uploaded_file in uploaded_files:
+            # Save each uploaded file to the temporary directory and store its path
+            uploaded_file_path = os.path.join(temp_dir.name, uploaded_file.name)
+            with open(uploaded_file_path, 'wb') as f:
+                f.write(uploaded_file.read())
+            uploaded_file_paths.append(uploaded_file_path)
+        # Use the first uploaded file as the image directory for YOLO
+        st.session_state['image_dir'] = uploaded_file_paths[0]
+
+
+# You can then use the 'get_predictions' function to run the object detection model and display the results as before.
+
+
+
+def get_predictions():
+    results_df = run(st.session_state['image_dir'])
+    st.session_state['df'] = results_df
+    
+    
+sidebar_col, grid_col, detect_col = st.columns([1,2,3])
+
+with sidebar_col:
     directory = st.selectbox('Select directory path:', ('', './test-images',), on_change=get_predictions, key='image_dir')
 
 import streamlit as st
