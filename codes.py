@@ -1,3 +1,53 @@
+data = None
+if 'df' in st.session_state:
+    with grid_col:
+        gb = GridOptionsBuilder.from_dataframe(st.session_state['df'])
+        gb.configure_side_bar()
+        gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc="sum", editable=True, )
+        gb.configure_selection(use_checkbox=True)
+        gridOptions = gb.build()
+        data = AgGrid(st.session_state['df'], 
+                      gridOptions=gridOptions, 
+                      enable_enterprise_modules=True, 
+                      allow_unsafe_jscode=True, 
+                      update_mode=GridUpdateMode.SELECTION_CHANGED, height=150, width='100%')
+
+
+        zip_href = save_detections()
+        st.markdown(zip_href,unsafe_allow_html=True)
+
+       
+with detect_col:
+    if data:
+        if data["selected_rows"]:
+            image_name = data["selected_rows"][0]['Image_ID']
+            #try:
+            detected_img = cv2.imread(os.path.join(f"./{st.session_state['image_dir']}", image_name +'.jpg'))
+            #except:
+                #detected_img = cv2.imread(os.path.join(f"./{st.session_state['image_dir']}", image_name +'.jpeg'))
+            jsons = os.listdir(f'./40_project/TOT/model_output/req_output/{date.today()}')
+            file_index = -1
+            json_list = []
+            for i in range(len(jsons)):
+                if image_name in jsons[i]:
+                    file_index = i
+                    json_list = jsons[i]
+                    break
+                    
+            # st.write(image_name, jsons[i].split('_')[1], jsons[file_index], file_index)
+            pred_path = f'./40_project/TOT/model_output/req_output/{date.today()}/{jsons[file_index]}'
+            with open(pred_path,'r') as f:
+                pred = json.load(f)
+            out_img = plot_dets(detected_img , pred)
+            pred_df = pd.read_csv('predictions.csv')
+            pred_text = str(pred_df[pred_df['Image_ID']==image_name]['Prediction'].values[0])
+            out_img = cv2.putText(out_img, pred_text,(100,100), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 5, cv2.LINE_AA)
+            st.image(out_img, channels='BGR')
+            cv2.imwrite('./predictions/' + image_name +'.jpg', out_img)
+		
+		
+		
+		
 import numpy as np
 from scipy.cluster.hierarchy import linkage, fcluster
 from Levenshtein import distance
