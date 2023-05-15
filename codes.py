@@ -1,3 +1,24 @@
+def create_html_with_images(html_file, image_files):
+    # Opening the HTML file in write mode
+    with open(html_file, 'w') as file:
+        # Writing the HTML header
+        file.write('<html>\n<head>\n</head>\n<body>\n')
+        
+        # Adding image tags for each image file
+        for image_file in image_files:
+            file.write(f'<img src="{image_file}" alt="Image">\n')
+        
+        # Closing the HTML tags
+        file.write('</body>\n</html>')
+
+# Example usage
+html_file = 'images.html'
+image_files = ['image1.jpg', 'image2.jpg', 'image3.jpg']
+create_html_with_images(html_file, image_files)
+
+
+
+
 data = None
 if 'df' in st.session_state:
     with grid_col:
