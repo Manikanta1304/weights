@@ -1,3 +1,34 @@
+import os
+from html import *
+
+# Define the list of image filenames
+image_filenames = ['image1.jpg', 'image2.jpg', 'image3.jpg']
+
+# Define the directory where the images are located
+image_dir = '/path/to/image/directory/'
+
+# Create the HTML file
+with open('example.html', 'w') as f:
+    # Write the HTML header
+    f.write('<html>\n<head>\n<title>Example HTML File</title>\n</head>\n<body>\n')
+
+    # Loop through the image filenames and add them to the HTML file
+    for filename in image_filenames:
+        # Get the full path to the image file
+        full_path = os.path.join(image_dir, filename)
+
+        # Create the HTML code for the image
+        img = img(src=full_path, width='300', height='200')
+
+        # Add the HTML code to the file
+        f.write(str(img) + '\n')
+
+    # Write the HTML footer
+    f.write('</body>\n</html>')
+
+
+
+
 def create_html_with_images(html_file, image_files):
     # Opening the HTML file in write mode
     with open(html_file, 'w') as file:
