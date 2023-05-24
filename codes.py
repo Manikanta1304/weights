@@ -1,3 +1,14 @@
+def rotate_box_coordinates(box, angle, image_width, image_height):
+    # Create a rotation matrix
+    rotation_matrix = cv2.getRotationMatrix2D((image_width / 2, image_height / 2), angle, 1.0)
+
+    # Transform the box coordinates using the rotation matrix
+    rotated_box = cv2.transform(np.array([box]), rotation_matrix)[0]
+
+    return rotated_box
+
+
+
 import os
 from html import *
 
