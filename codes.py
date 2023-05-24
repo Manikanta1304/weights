@@ -1,3 +1,29 @@
+import cv2
+import numpy as np
+
+def rotate_bounding_box(xmin, xmax, ymin, ymax, angle_degrees):
+    center_x = (xmin + xmax) / 2
+    center_y = (ymin + ymax) / 2
+
+    translated_xmin = xmin - center_x
+    translated_xmax = xmax - center_x
+    translated_ymin = ymin - center_y
+    translated_ymax = ymax - center_y
+
+    rotation_angle_radians = np.deg2rad(angle_degrees)
+    rotation_matrix = cv2.getRotationMatrix2D((0, 0), angle_degrees, 1)
+
+    rotated_xmin, rotated_ymin = np.dot(rotation_matrix, [translated_xmin, translated_ymin, 1])
+    rotated_xmax, rotated_ymax = np.dot(rotation_matrix, [translated_xmax, translated_ymax, 1])
+
+    rotated_xmin += center_x
+    rotated_xmax += center_x
+    rotated_ymin += center_y
+    rotated_ymax += center_y
+
+    return rotated_xmin, rotated_xmax, rotated_ymin, rotated_ymax
+
+
 def rotate_box_coordinates(box, angle, image_width, image_height):
     # Create a rotation matrix
     rotation_matrix = cv2.getRotationMatrix2D((image_width / 2, image_height / 2), angle, 1.0)
