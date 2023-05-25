@@ -1,3 +1,32 @@
+# display ocr results in a grid
+if 'ocr_results' in st.session_state:
+
+    st.text('### Ocr Results:')
+
+    # display ocr results in a grid
+    col1, col2, col3 = st.columns([0.2, 1, 0.2])
+
+    # grid of ocr results
+    with col2: 
+        # Define number of columns in the grid
+        cols = 4
+
+        # Calculate number of rows in the grid
+        rows = len(st.session_state['ocr_results']) // cols + 1  
+
+        # Create the grid columns
+        grid = [st.columns(cols) for i in range(rows)]
+
+        # Iterate over the images and display each one in the grid
+        for index, item in enumerate(st.session_state['ocr_results']):
+            if index < len(st.session_state['ocr_results']):
+                j = index % cols
+                i = index // cols
+                caption = item[1]
+                grid[i][j].image(item[0], use_column_width=True, caption=caption)
+		
+		
+		
 import cv2
 import numpy as np
 
