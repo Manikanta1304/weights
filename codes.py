@@ -1,3 +1,15 @@
+st.markdown(
+                """
+                <style>
+                .subheader-caption {
+                    margin-left: 100px; /* Adjust the margin value as per your preference */
+                }
+                </style>
+                """,
+                unsafe_allow_html=True,
+            )
+
+
 # display ocr results in a grid
 if 'ocr_results' in st.session_state:
 
