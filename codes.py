@@ -1,3 +1,44 @@
+import sys
+import os
+import subprocess
+import win32serviceutil
+import win32service
+import win32event
+
+# Update the path to your conda environment
+CONDA_ENV_PATH = r'C:\path\to\your\conda\env'
+
+# Update the path to your Streamlit application
+STREAMLIT_APP_PATH = r'C:\path\to\your\streamlit\application.py'
+
+class StreamlitService(win32serviceutil.ServiceFramework):
+    _svc_name_ = 'StreamlitService'
+    _svc_display_name_ = 'Streamlit Service'
+
+    def __init__(self, args):
+        win32serviceutil.ServiceFramework.__init__(self, args)
+        self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
+        self.process = None
+
+    def SvcStop(self):
+        self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
+        win32event.SetEvent(self.hWaitStop)
+        if self.process:
+            self.process.terminate()
+
+    def SvcDoRun(self):
+        os.chdir(CONDA_ENV_PATH)
+        self.process = subprocess.Popen(['streamlit', 'run', STREAMLIT_APP_PATH])
+        win32event.WaitForSingleObject(self.hWaitStop, win32event.INFINITE)
+
+if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        servicemanager.Initialize()
+        servicemanager.PrepareToHostSingle(StreamlitService)
+        servicemanager.StartServiceCtrlDispatcher()
+    else:
+        win32serviceutil.HandleCommandLine(StreamlitService)
+
 st.markdown(
                 """
                 <style>
