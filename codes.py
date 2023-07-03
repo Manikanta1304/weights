@@ -1,3 +1,30 @@
+import subprocess
+import os
+
+def resize_images(folder_path, width, height):
+    # Create a new folder for resized images
+    thumbs_folder = os.path.join(folder_path, 'thumbs')
+    os.makedirs(thumbs_folder, exist_ok=True)
+
+    # Resize the images and save them in the thumbs folder
+    command = f"mogrify -path {thumbs_folder} -resize {width}x{height} {folder_path}/*.jpg"  # Change '*.jpg' to match the file extension of your images
+    
+    try:
+        subprocess.run(command, shell=True, check=True)
+        print("Images resized successfully!")
+    except subprocess.CalledProcessError as e:
+        print("Error resizing images:", e)
+
+# Usage example
+folder_path = "/path/to/folder"  # Specify the path to your folder of images
+width = 800  # Specify the desired width
+height = 600  # Specify the desired height
+
+resize_images(folder_path, width, height)
+
+
+
+
 import sys
 import os
 import subprocess
