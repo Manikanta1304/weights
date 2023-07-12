@@ -1,3 +1,60 @@
+import pandas as pd
+import librosa
+import numpy as np
+
+# Load metadata.csv file
+metadata = pd.read_csv('metadata.csv')
+
+# Split metadata into file names and class labels
+file_names = metadata['file_name'].tolist()
+class_labels = metadata['class_label'].tolist()
+
+# Define the augmentation techniques
+augmentation_techniques = ['time_stretching', 'pitch_shifting']
+augmented_files = []
+augmented_labels = []
+
+# Iterate through the audio files
+for file_name, class_label in zip(file_names, class_labels):
+    # Load audio file
+    audio, sr = librosa.load(file_name, sr=None)
+    
+    # Apply augmentation techniques
+    for technique in augmentation_techniques:
+        augmented_audio = audio.copy()
+        
+        if technique == 'time_stretching':
+            # Apply time stretching to the audio
+            rate = np.random.uniform(0.8, 1.2)
+            augmented_audio = librosa.effects.time_stretch(augmented_audio, rate)
+            
+        elif technique == 'pitch_shifting':
+            # Apply pitch shifting to the audio
+            n_steps = np.random.randint(-3, 3)
+            augmented_audio = librosa.effects.pitch_shift(augmented_audio, sr, n_steps)
+        
+        # Add augmented audio and label to the lists
+        augmented_files.append(augmented_audio)
+        augmented_labels.append(class_label)
+
+# Convert augmented files and labels to numpy arrays
+augmented_files = np.array(augmented_files)
+augmented_labels = np.array(augmented_labels)
+
+# Combine original and augmented data
+combined_files = np.concatenate([audio, augmented_files], axis=0)
+combined_labels = np.concatenate([class_labels, augmented_labels], axis=0)
+
+# Save the combined audio files and labels for further processing
+# ...
+
+# Proceed with further analysis using the augmented dataset
+# ...
+
+
+
+
+
 import subprocess
 import os
 
