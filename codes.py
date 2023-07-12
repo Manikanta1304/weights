@@ -1,6 +1,100 @@
 import pandas as pd
 import librosa
 import numpy as np
+import math
+
+# Load metadata.csv file
+metadata = pd.read_csv('metadata.csv')
+
+# Split metadata into file names and class labels
+file_names = metadata['file_name'].tolist()
+class_labels = metadata['class_label'].tolist()
+
+# Define the output directory to save augmented files
+output_directory = 'augmented_audio/'
+
+# Create a new dataframe to store the updated metadata
+updated_metadata = pd.DataFrame(columns=['file_name', 'class_label'])
+
+# Define the threshold for segmenting longer audio files
+segment_length = 100  # in seconds
+
+# Define the augmentation techniques
+augmentation_techniques = ['time_stretching', 'pitch_shifting']
+
+# Iterate through the audio files
+for file_name, class_label in zip(file_names, class_labels):
+    # Load audio file
+    audio, sr = librosa.load(file_name, sr=None)
+    
+    # Check if audio length exceeds the segment threshold
+    if len(audio) > segment_length * sr:
+        num_segments = math.ceil(len(audio) / (segment_length * sr))
+        
+        # Divide audio into smaller segments
+        for i in range(num_segments):
+            start = i * segment_length * sr
+            end = min((i + 1) * segment_length * sr, len(audio))
+            segment_audio = audio[start:end]
+            
+            # Apply augmentation techniques
+            for technique in augmentation_techniques:
+                augmented_audio = segment_audio.copy()
+                
+                if technique == 'time_stretching':
+                    # Apply time stretching to the audio segment
+                    rate = np.random.uniform(0.8, 1.2)
+                    augmented_audio = librosa.effects.time_stretch(augmented_audio, rate)
+                    
+                elif technique == 'pitch_shifting':
+                    # Apply pitch shifting to the audio segment
+                    n_steps = np.random.randint(-3, 3)
+                    augmented_audio = librosa.effects.pitch_shift(augmented_audio, sr, n_steps)
+                
+                # Generate a new file name for the augmented audio segment
+                augmented_file_name = output_directory + 'augmented_' + str(i) + '_' + file_name.split('/')[-1]
+                
+                # Save the augmented audio segment
+                librosa.output.write_wav(augmented_file_name, augmented_audio, sr)
+                
+                # Add the augmented file name and label to the updated metadata
+                updated_metadata = updated_metadata.append({'file_name': augmented_file_name, 'class_label': class_label},
+                                                           ignore_index=True)
+    else:
+        # Apply augmentation techniques to the full audio file
+        for technique in augmentation_techniques:
+            augmented_audio = audio.copy()
+            
+            if technique == 'time_stretching':
+                # Apply time stretching to the audio
+                rate = np.random.uniform(0.8, 1.2)
+                augmented_audio = librosa.effects.time_stretch(augmented_audio, rate)
+                
+            elif technique == 'pitch_shifting':
+                # Apply pitch shifting to the audio
+                n_steps = np.random.randint(-3, 3)
+                augmented_audio = librosa.effects.pitch_shift(augmented_audio, sr, n_steps)
+            
+            # Generate a new file name for the augmented audio
+            augmented_file_name = output_directory + 'augmented_' + file_name.split('/')[-1]
+            
+            # Save the augmented audio file
+            librosa.output.write_wav(augmented_file_name, augmented_audio, sr)
+            
+            # Add the augmented file name and label to the updated metadata
+            updated_metadata = updated_metadata.append({'file_name': augmented_file_name, 'class_label': class_label},
+                                                       ignore_index=True)
+
+# Combine original and augmented data in the updated metadata
+updated_metadata = updated_metadata.append(metadata, ignore_index=True)
+
+# Save the updated metadata to a new CSV file
+updated_metadata.to_csv('updated_metadata.csv', index=False)
+
+
+import pandas as pd
+import librosa
+import numpy as np
 
 # Load metadata.csv file
 metadata = pd.read_csv('metadata.csv')
