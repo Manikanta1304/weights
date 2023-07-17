@@ -1,3 +1,34 @@
+import cv2
+
+# Define the bounding box coordinates
+x, y, w, h = 100, 100, 200, 100
+
+# Load the image
+image = cv2.imread("your_image.jpg")
+
+# Draw the bounding box
+cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+# Define the text and font properties
+text = "Bounding Box"
+font = cv2.FONT_HERSHEY_SIMPLEX
+font_scale = 1
+thickness = 2
+
+# Calculate the text position
+(text_width, text_height), _ = cv2.getTextSize(text, font, font_scale, thickness)
+text_x = x + (w - text_width) // 2
+text_y = y - 10
+
+# Put the text on the image
+cv2.putText(image, text, (text_x, text_y), font, font_scale, (0, 255, 0), thickness)
+
+# Display the image
+cv2.imshow("Image", image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
 import pandas as pd
 import librosa
 import numpy as np
