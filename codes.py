@@ -1,3 +1,7 @@
+import os
+os.environ['PYTHONPATH'] = f"{os.getcwd()}:{os.environ.get('PYTHONPATH', '')}"
+
+
 import cv2
 
 # Define the bounding box coordinates
