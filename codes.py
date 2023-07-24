@@ -1,3 +1,44 @@
+import base64
+from PIL import Image
+from io import BytesIO
+
+def image_to_base64(image):
+    try:
+        # If the input is a file path, open the image
+        if isinstance(image, str):
+            with open(image, 'rb') as f:
+                image_obj = Image.open(f)
+        # If the input is a file object, open the image
+        elif hasattr(image, 'read'):
+            image_obj = Image.open(image)
+        else:
+            raise ValueError("Invalid input. Please provide a valid image path or image file object.")
+        
+        # Convert the image to a bytes buffer
+        buffer = BytesIO()
+        image_obj.save(buffer, format='PNG')  # You can choose a different format if needed
+
+        # Encode the bytes buffer as base64
+        base64_encoded = base64.b64encode(buffer.getvalue()).decode('utf-8')
+
+        return base64_encoded
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return None
+
+# Example usage:
+# 1. From file path
+encoded_image1 = image_to_base64("path/to/your/image.jpg")
+
+# 2. From image file object
+with open("path/to/your/image.jpg", 'rb') as f:
+    encoded_image2 = image_to_base64(f)
+
+print(encoded_image1)
+print(encoded_image2)
+
+
 import os
 os.environ['PYTHONPATH'] = f"{os.getcwd()}:{os.environ.get('PYTHONPATH', '')}"
 
