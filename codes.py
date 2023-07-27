@@ -1,35 +1,28 @@
 def save_images():
-    
+
     # st.write(st.session_state['directory'])
-    uploaded_file = st.session_state['directory']
+    uploaded_files = st.session_state.get('directory', [])
     
     # creating the directory to store the input images for each experiment
     count = 0
-    if len(uploaded_file)>=1:
-        count += 1
-        directory = os.path.join(IMG_DIR, f'exp{count}')
-        
-        while os.path.exists(directory):
+    if len(uploaded_files)>=1:
+        if 'image_dir' not in st.session_state:
             count += 1
             directory = os.path.join(IMG_DIR, f'exp{count}')
-        os.makedirs(directory)
+            
+            while os.path.exists(directory):
+                count += 1
+                directory = os.path.join(IMG_DIR, f'exp{count}')
+            os.makedirs(directory, exist_ok=True)
+            # set this directory to the session state for running the predictions
+            st.session_state['image_dir'] = directory
+        else:
+            directory = st.session_state['image_dir']
         
-        for file_no,file in enumerate(uploaded_file):
+        for file in uploaded_files:
             picture = Image.open(file)
             picture = ImageOps.exif_transpose(picture)
-            picture = picture.save(os.path.join(directory, file.name.split('.')[0] + '.jpg'))
-            
-        # Use the first uploaded file as the image directory for YOLO
-        st.session_state['image_dir'] = directory
-
-        # check which method is selected and run accordingly
-        if method=='Local':
-            get_predictions()
-        else:
-            st.session_state['api_df'] = api_call(directory)
-
-    elif 'local_df' in st.session_state:
-        del st.session_state['df']
+            picture = picture.save(os.path.join(directory, file.name.split('.')[0] + '.jpg')) 
 	    
 
 import base64
