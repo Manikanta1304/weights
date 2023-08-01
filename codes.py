@@ -1,3 +1,34 @@
+with fullres_col:
+    #st.write(st.session_state)
+    if grid_updates:
+        if grid_updates.selected_rows:
+            selected_img = grid_updates.selected_rows[0]["img_name"]
+            if method == 'CDL':
+                st.write(selected_img) #, os.path.join(st.session_state.data_dir, IMG_DIR, selected_img))
+                with adlsFileSystemClient.open(os.path.join(st.session_state.data_dir, selected_img), "rb") as img_file:
+                    img = Image.open(BytesIO(img_file.read()))
+                    img = np.array(img)
+                    if uploaded_file and uploaded_file.name.endswith("json"):
+                        df_img = df_merged[df_merged['img_name'] == selected_img]
+                        for i, row in df_img.iterrows():
+                            x,y,w,h = row['bbox']
+                            cv2.rectangle(img, (x, y), (x+w, y+h), (0, 0, 255), 2)
+                            cv2.putText(img, row['name'], (x, y-10), cv2.FONT_HERSHEY_DUPLEX, 0.7, (255, 0, 0), 1, cv2.LINE_AA)
+                            main_array = []
+                            for i in range(0, len(row['segmentation'][0]), 2):
+                                pt = [int(row['segmentation'][0][i]), int(row['segmentation'][0][i+1])]
+                                main_array.append(pt)
+                            poly = np.array(main_array , np.int32)
+                            img = cv2.polylines(img, [poly], True, (0, 255, 0), 3)
+                    st.image(img)
+                    
+            else:
+                img_path = os.path.join(st.session_state.data_dir,IMG_DIR,selected_img)
+                img = Image.open(img_path)
+                st.image(img)
+
+
+
 def save_images():
 
     # st.write(st.session_state['directory'])
