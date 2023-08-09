@@ -1,3 +1,29 @@
+    data_dir = st.text_input("CDL path", key='data_dir', on_change=scan_data_dir,
+                                help="relative CDL image path for RFT eg:/40_project/RFT/images/TD_Dataset_Set1/Test_Images/")
+    
+    if data_dir:
+        agree = st.checkbox('Want to upload the annotations?')
+
+        if agree:
+            parser_name = st.selectbox("Select Annotation Parser", ('COCO', 'RFT', 'METADATA'), index=0)
+            st.info(f"{parser_name} selected")
+
+            if 'df' in st.session_state:
+                if parser_name == 'COCO':
+                    ann_path = st.text_input('CDL path to the annotations file', help="Relative CDL path of the annotations, must be in coco format")
+                    if ann_path and ann_path.endswith(".json"):
+                        parser = get_parser(parser_name)
+                        parser.load_ann(ann_path)
+                    else: 
+                        parser = get_parser(parser_name)
+                        parser.load_ann(ann_path)
+                    #elif not ann_path.endswith(".json"): st.write('Please provide the correct coco annotation path')
+                else:
+                    parser = get_parser(parser_name)
+                    parser.load_ann(st.session_state['data_dir']) 
+
+
+
 with fullres_col:
     #st.write(st.session_state)
     if grid_updates:
