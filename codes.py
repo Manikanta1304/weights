@@ -1,3 +1,139 @@
+import contextlib
+from io import BytesIO
+
+import numpy as np
+import requests
+import streamlit as st
+from PIL import Image, ImageEnhance, ImageOps
+from streamlit_cropper import st_cropper
+
+VERSION = "0.7.0"
+
+st.set_page_config(
+    page_title="Crop and Rotate App",
+    page_icon="🖼️",
+    layout="wide",
+)
+
+st.markdown("""
+        <style>
+               .block-container {
+                    padding-top: 0rem;
+                }
+        </style>
+        """, unsafe_allow_html=True)
+
+# ---------- HEADER ----------
+st.title("🖼️ Crop and Rotate App!")
+
+
+# ---------- FUNCTIONS ----------
+def _reset(key: str) -> None:
+    if key == "all":
+        st.session_state["rotate_slider"] = 0
+        st.session_state["crop"] = False
+    elif key == "rotate_slider":
+        st.session_state["rotate_slider"] = 0
+    else:
+        st.session_state[key] = 100
+
+
+
+# ---------- OPERATIONS ----------
+upload_img = st.sidebar.file_uploader(
+        label="Upload an image",
+        type=["bmp", "jpg", "jpeg", "png", "svg"],
+        accept_multiple_files=True
+    )
+
+
+with contextlib.suppress(NameError):
+    if upload_img is not None:
+        # images = [Image.open(file) for file in uploaded_files]
+        pil_img = (Image.open(upload_img).convert("RGB"))
+        img_arr = np.asarray(pil_img)
+
+        with st.container():
+            lcol, rcol = st.columns(2)
+
+            # ---------- PROPERTIES ----------
+            with lcol:
+                st.text(
+                    f"Original width = {pil_img.size[0]}px and height = {pil_img.size[1]}px"
+                )
+
+                st.caption("All changes are applied on top of the previous change.")
+
+                # ---------- CROP ----------
+                st.text("Crop image ✂️")
+                cropped_img = st_cropper(Image.fromarray(img_arr), should_resize_image=True, return_type='image')
+                st.text(
+                    f"Cropped width = {cropped_img.size[0]}px and height = {cropped_img.size[1]}px"
+                )
+
+            if rcol.checkbox(
+                label="Use cropped Image?",
+                help="Select to use the cropped image in further operations",
+                key="crop",
+            ):
+                image = cropped_img
+            else:
+                image = Image.fromarray(img_arr)
+
+
+            # ---------- ROTATE ----------
+            if "rotate_slider" not in st.session_state:
+                st.session_state["rotate_slider"] = 0
+            degrees = rcol.slider(
+                "Drag slider to rotate image clockwise 🔁",
+                min_value=0,
+                max_value=360,
+                value=st.session_state["rotate_slider"],
+                key="rotate_slider",
+            )
+            rotated_img = image.rotate(360 - degrees)
+            rcol.image(
+                rotated_img,
+                # width=500,
+                use_column_width="auto",
+                caption=f"Rotated by {degrees} degrees clockwise",
+            )
+            
+            flag = False 
+            if rcol.button(
+                "↩️ Reset Rotation",
+                on_click=_reset,
+                use_container_width=True,
+                kwargs={"key": "rotate_slider"},
+            ):
+                rcol.success("Rotation reset to original!")
+
+        
+        # ---------- Final Results ----------
+        final_image = rotated_img.copy()
+
+        if flag:
+            Image.fromarray(final_image).save("final_image.png")
+        else:
+            final_image.save("final_image.png")
+
+        if rcol.button(
+            "↩️ Reset All",
+            on_click=_reset,
+            use_container_width=True,
+            kwargs={"key": "all"},
+        ):
+            st.success(body="Image reset to original!", icon="↩️")
+
+        with open("final_image.png", "rb") as file:
+            rcol.download_button(
+                "💾Download final image",
+                data=file,
+                mime="image/png",
+                use_container_width=True,
+            )
+		
+		
 import streamlit as st 
 from PIL import Image
 st.set_page_config(layout='wide', page_title='Image Processing App')
