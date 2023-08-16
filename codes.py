@@ -1,3 +1,130 @@
+import streamlit as st
+import numpy as np
+from PIL import Image
+import contextlib
+
+# Initialize image list and index
+uploaded_images = []
+current_image_index = 0
+
+# ---------- HEADER ----------
+st.title("🖼️ Crop and Rotate App!")
+
+# ---------- FUNCTIONS ----------
+def reset(key: str) -> None:
+    global current_image_index
+    if key == "all":
+        current_image_index = 0
+        st.session_state["rotate_slider"] = 0
+        st.session_state["crop"] = False
+    elif key == "rotate_slider":
+        st.session_state["rotate_slider"] = 0
+    else:
+        st.session_state[key] = 100
+
+# ---------- OPERATIONS ----------
+upload_images = st.sidebar.file_uploader(
+    label="Upload images",
+    type=["bmp", "jpg", "jpeg", "png", "svg"],
+    accept_multiple_files=True
+)
+
+if upload_images:
+    uploaded_images = [Image.open(img) for img in upload_images]
+
+if not uploaded_images:
+    st.sidebar.warning("Upload images to get started.")
+
+if current_image_index < len(uploaded_images):
+    pil_img = uploaded_images[current_image_index]
+    img_arr = np.asarray(pil_img)
+
+    with contextlib.suppress(NameError):
+        with st.container():
+            lcol, rcol = st.columns(2)
+
+            # ---------- PROPERTIES ----------
+            with lcol:
+                st.text(
+                    f"Original width = {pil_img.size[0]}px and height = {pil_img.size[1]}px"
+                )
+
+                st.caption("All changes are applied on top of the previous change.")
+
+                # ---------- CROP ----------
+                st.text("Crop image ✂️")
+                cropped_img = st_cropper(Image.fromarray(img_arr), should_resize_image=True, return_type='image')
+                st.text(
+                    f"Cropped width = {cropped_img.size[0]}px and height = {cropped_img.size[1]}px"
+                )
+
+            if rcol.checkbox(
+                label="Use cropped Image?",
+                help="Select to use the cropped image in further operations",
+                key="crop",
+            ):
+                image = cropped_img
+            else:
+                image = Image.fromarray(img_arr)
+
+            # ---------- ROTATE ----------
+            if "rotate_slider" not in st.session_state:
+                st.session_state["rotate_slider"] = 0
+            degrees = rcol.slider(
+                "Drag slider to rotate image clockwise 🔁",
+                min_value=0,
+                max_value=360,
+                value=st.session_state["rotate_slider"],
+                key="rotate_slider",
+            )
+            rotated_img = image.rotate(360 - degrees)
+            rcol.image(
+                rotated_img,
+                use_column_width="auto",
+                caption=f"Rotated by {degrees} degrees clockwise",
+            )
+
+            if rcol.button(
+                "↩️ Reset Rotation",
+                on_click=reset,
+                use_container_width=True,
+                kwargs={"key": "rotate_slider"},
+            ):
+                rcol.success("Rotation reset to original!")
+
+    # ---------- Final Results ----------
+    final_image = rotated_img.copy()
+
+    if rcol.button(
+        "↩️ Reset All",
+        on_click=reset,
+        use_container_width=True,
+        kwargs={"key": "all"},
+    ):
+        st.success(body="Image reset to original!", icon="↩️")
+
+    with open("final_image.png", "rb") as file:
+        rcol.download_button(
+            "💾 Download final image",
+            data=file,
+            mime="image/png",
+            use_container_width=True,
+        )
+
+# Navigation buttons
+if current_image_index > 0:
+    st.button("Previous Image", on_click=lambda: change_image(-1))
+if current_image_index < len(uploaded_images) - 1:
+    st.button("Next Image", on_click=lambda: change_image(1))
+
+def change_image(change):
+    global current_image_index
+    current_image_index += change
+    reset("all")
+
+
+
+
 import contextlib
 from io import BytesIO
 
