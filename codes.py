@@ -1,3 +1,29 @@
+import streamlit as st 
+from PIL import Image
+st.set_page_config(layout='wide', page_title='Image Processing App')
+
+
+st.title("Crop and Rotate App") 
+
+def rotate(image, rotation_amount):
+     #st.button('Rotate photo'):
+        rot_image = image.rotate(rotation_amount)
+        st.session_state['rot_image'] = rot_image
+        
+
+uploaded_file = st.sidebar.file_uploader("Choose a file", type=["jpg", "png"])
+rotation_amount = st.sidebar.slider("Rotation", min_value=0, max_value = 360)
+
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+    if rotation_amount>=0:
+        rotate(image, rotation_amount)
+        st.image(st.session_state['rot_image'], width=500)
+
+
+
+
+
 Given the neural network definition below, what should be the size of the input image?
 
 class Net(nn.Module):
